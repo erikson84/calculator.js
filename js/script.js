@@ -52,6 +52,8 @@ function storeNumOp(e) {
 
     if (memory.a === null && operator == '=') return;
 
+    if (memory.justUpdated) return;
+
     let b = +display.textContent.trim();
     let result = operate(memory.operator, memory.a, b);
     display.textContent = Math.round(result * 10e8)/10e8    ;
