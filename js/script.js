@@ -1,16 +1,18 @@
 const display = document.querySelector('.display');
-const numButtons = document.querySelectorAll(".button.number");
-const opsButtons = document.querySelectorAll(".button.operation");
-const ctrlButtons = document.querySelectorAll(".button.ctrl");
+const numButtons = document.querySelectorAll(".number");
+const opsButtons = document.querySelectorAll(".operation");
+const ctrlButtons = document.querySelectorAll(".ctrl");
 
 const memory = {
     a: null,
-    b: null,
     operator: null,
+    justUpdated: null,
 }
 
-numButtons.forEach(num => addEventListener('click', updateDisplay));
-opsButtons.forEach(num => addEventListener('click', storeNumOp));
+numButtons.forEach(num => num.addEventListener('click', updateDisplay));
+opsButtons.forEach(num => num.addEventListener('click', storeNumOp));
+ctrlButtons[0].addEventListener('click', undo);
+ctrlButtons[1].addEventListener('click', reset);
 
 function updateDisplay(e) {
     const curNum = display.textContent.trim();
@@ -28,20 +30,58 @@ function updateDisplay(e) {
         return
     }
 
+    if (memory.justUpdated) {
+        display.textContent = newNum;
+        memory.justUpdated = false;
+        return
+    }
+
     display.textContent = curNum + newNum;
 
 }
 
 function storeNumOp(e) {
-    if (memory.a === null) {
-        memory.a = +display.textContent;
-        memory.operator = e.srcElement.textContent;
-    } else {
-        
+    let operator = e.srcElement.textContent.trim();
+
+    if (memory.a === null && operator != '=') {
+        memory.a = +display.textContent.trim();
+        memory.operator = operator;
+        memory.justUpdated = true;
+        return
     }
+
+    if (memory.a === null && operator == '=') return;
+
+    let b = +display.textContent.trim();
+    let result = operate(memory.operator, memory.a, b);
+    display.textContent = Math.round(result * 10e8)/10e8    ;
+    if (operator == '=') {
+        memory.a = null;
+        memory.operator = null;
+        memory.justUpdated = true;
+    } else {
+        memory.a = result;
+        memory.operator = operator;
+        memory.justUpdated = true;
+    }
+    
 
 }
 
+function undo(e) {
+    if (display.textContent.length == 1) {
+        display.textContent = 0;
+        return
+    }
+    display.textContent = display.textContent.slice(0, display.textContent.length-1);
+}
+
+function reset(e) {
+    display.textContent = 0;
+    memory.a = null;
+    memory.operator = null;
+    memory.justUpdated = null;
+}
 
 function add(a, b) {
     return a + b
@@ -68,6 +108,6 @@ function operate(operator, a, b) {
         case '×':
             return multiply(a, b);
         case '÷':
-            return multiply(a, b);
+            return divide(a, b);
     }
 }
