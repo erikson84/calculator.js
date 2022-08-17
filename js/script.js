@@ -18,22 +18,29 @@ window.addEventListener('keydown', processKey);
 function updateDisplay(e) {
     const curNum = display.textContent.trim();
     const newNum = e.srcElement.textContent.trim();
+
+    if (memory.justUpdated) {
+        display.textContent = newNum;
+        memory.justUpdated = false;
+        return
+    }
+
     if (curNum === '0') {
         display.textContent = (newNum == '.') ? curNum + newNum : newNum;
         return
     }
     if (newNum == '.') {
-        display.textContent = curNum.includes('.') ? curNum : curNum + newNum;
+        if (memory.justUpdated) {
+            display.textContent = '0.';
+            memory.justUpdated = false;
+        } else {
+            display.textContent = curNum.includes('.') ? curNum : curNum + newNum;
+        }
+        
         return
     }
     if (curNum.length > 10) {
         display.textContent = curNum;
-        return
-    }
-
-    if (memory.justUpdated) {
-        display.textContent = newNum;
-        memory.justUpdated = false;
         return
     }
 
@@ -87,28 +94,9 @@ function reset(e) {
 }
 
 function processKey(e) {
-    switch(e.key) {
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case '.':
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '=':
-        case 'c':
-        case 'Backspace':
-            const key = document.querySelector(`div[data-key="${e.key}"]`);
-            key.click();
-    }
+    const key = document.querySelector(`div[data-key="${e.key}"]`);
+    if (key == null) return;
+    key.click();
 }
 
 function add(a, b) {
@@ -124,6 +112,10 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+    if (b === 0) {
+        alert("Cannot divide by zero");
+        return 0;
+    }
     return a / b
 }
 
