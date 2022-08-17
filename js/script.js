@@ -13,6 +13,7 @@ numButtons.forEach(num => num.addEventListener('click', updateDisplay));
 opsButtons.forEach(num => num.addEventListener('click', storeNumOp));
 ctrlButtons[0].addEventListener('click', undo);
 ctrlButtons[1].addEventListener('click', reset);
+window.addEventListener('keydown', processKey);
 
 function updateDisplay(e) {
     const curNum = display.textContent.trim();
@@ -83,6 +84,31 @@ function reset(e) {
     memory.a = null;
     memory.operator = null;
     memory.justUpdated = null;
+}
+
+function processKey(e) {
+    switch(e.key) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '.':
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '=':
+        case 'c':
+        case 'Backspace':
+            const key = document.querySelector(`div[data-key="${e.key}"]`);
+            key.click();
+    }
 }
 
 function add(a, b) {
