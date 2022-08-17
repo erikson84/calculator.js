@@ -64,7 +64,11 @@ function storeNumOp(e) {
 
     let b = +display.textContent.trim();
     let result = operate(memory.operator, memory.a, b);
-    display.textContent = Math.round(result * 10e8)/10e8    ;
+    if (result.toString().length > 10) {
+        result = Math.round(10e10 * result) / 10e10;
+        result = +result.toString().slice(0, 11);
+    }
+    display.textContent = result;
     if (operator == '=') {
         memory.a = null;
         memory.operator = null;
